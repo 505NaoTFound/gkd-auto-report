@@ -109,7 +109,7 @@ def submit(s: requests.Session):
     else:
         send_message('打卡失败', r.json().get("m"))
 
-        
+
 def send_message(title: str, content: str):
     content = time_str + content
     print(time_now)
