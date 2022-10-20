@@ -10,6 +10,12 @@ GKD_NUMBER = os.environ["GKD_NUMBER"]
 GKD_NAME = os.environ["GKD_NAME"]
 PUSH_TOKEN = os.environ["PUSH_TOKEN"]
 
+time_now = time.time()
+if time.timezone == 0:
+    time_now += 28800
+time_now = time.localtime(time_now)
+time_str = time.strftime('%Y-%m-%d %H:%M:%S', time_now)
+
 
 def login(s: requests.Session):
     r = s.post("https://app.ucas.ac.cn/uc/wap/login/check", data={
@@ -94,12 +100,19 @@ def submit(s: requests.Session):
 
     result = r.json()
     if result.get('m') == "操作成功":
-        send_message('打卡成功', '')
+        if time_now.tm_hour >= 6:
+            send_message('打卡成功', '打卡成功！')
+    elif result.get('m') == '今天已经填报了':
+        print(time_str + '今天已经填报了')
+        if time_now.tm_hour >= 6:
+            send_message('打卡成功', '打卡成功！')
     else:
         send_message('打卡失败', r.json().get("m"))
 
-
+        
 def send_message(title: str, content: str):
+    content = time_str + content
+    print(time_now)
     print(title)
     print(content)
     res = requests.get(
